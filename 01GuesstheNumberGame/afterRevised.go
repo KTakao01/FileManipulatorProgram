@@ -13,7 +13,7 @@ func main() {
 	fmt.Print("Enter max and min: ")
 	_, err := fmt.Scanf("%d %d", &max, &min)
 	if err != nil || max <= min {
-		fmt.Println("Invalid input. Ensure max > min.")
+		fmt.Println("Invalid input. Ensure number and max > min.")
 		return
 	}
 
