@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 //main,reverseへの切り分け
@@ -44,7 +45,16 @@ func main() {
 
 	command := os.Args[1]
 	inputFile := os.Args[2]
-	outputFile := os.Args[3]
+	var outputFile, duplicateNumber string
+
+	if command == "copy" || command == "reverse" {
+		outputFile = os.Args[3]
+	}
+
+	if command == "duplicate-contents" {
+		duplicateNumber = os.Args[3]
+	}
+
 	//モックのための便宜的な具体型の導入
 	ops := &defaultFileOperations{}
 
@@ -59,6 +69,15 @@ func main() {
 		err := copy(inputFile, outputFile, ops, ops)
 		if err != nil {
 			fmt.Println("Error processing copy:", err)
+		}
+	case "duplicate-contents":
+		loopNumber, err := strconv.Atoi(duplicateNumber)
+		if err != nil {
+			fmt.Println("error to change from string to int ", err)
+		}
+		err = duplicateContents(inputFile, loopNumber, ops, ops)
+		if err != nil {
+			fmt.Println("Error processing duplicate-contents:", err)
 		}
 
 	}
@@ -94,6 +113,26 @@ func copy(inputFile, outputFile string, reader ReadFile, writer WriteFile) error
 	if err != nil {
 		return fmt.Errorf("Error writing to file: %w", err)
 	}
+	return nil
+}
+
+func duplicateContents(inputFile string, loopNumber int, reader ReadFile, writer WriteFile) error {
+	originalContent, err := reader.ReadFile(inputFile)
+	if err != nil {
+		return fmt.Errorf("Error reading content: %w", err)
+	}
+
+	// 元の内容をloopNumber回複製する
+	var duplicatedContent []byte
+	for i := 0; i < loopNumber; i++ {
+		duplicatedContent = append(duplicatedContent, originalContent...)
+	}
+
+	err = writer.WriteFile(inputFile, duplicatedContent, 0644)
+	if err != nil {
+		return fmt.Errorf("Error writing to file: %w", err)
+	}
+
 	return nil
 }
 

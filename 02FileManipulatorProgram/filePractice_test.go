@@ -20,12 +20,17 @@ func (m *mockFileReader) ReadFile(filename string) ([]byte, error) {
 
 // ファイル書き込みのモックを作成
 type mockFileWriter struct {
-	err error
+	writtenContent []byte
+	err            error
 }
 
 // mockFileWriterのWriteFileメソッドを実装
 func (m *mockFileWriter) WriteFile(filename string, data []byte, perm os.FileMode) error {
-	return m.err
+	if m.err != nil {
+		return m.err
+	}
+	m.writtenContent = data
+	return nil
 }
 
 // reverse関数のテストを実装
@@ -95,8 +100,9 @@ func TestReverse(t *testing.T) {
 				}
 			}
 
-			// 正常系の場合の確認
-			// 予期しないエラーが発生した場合の確認
+			if tt.expectedOutput != string(writer.writtenContent) {
+				t.Errorf("expected %s but got %s", tt.expectedOutput, string(writer.writtenContent))
+			}
 
 		})
 	}
@@ -161,8 +167,85 @@ func TestCopy(t *testing.T) {
 				}
 			}
 
+			if tt.expectedOutput != string(writer.writtenContent) {
+				t.Errorf("expected %s but got %s", tt.expectedOutput, string(writer.writtenContent))
+			}
 		})
 
+	}
+
+}
+
+// duplicateContents関数のテストを実装
+func TestDuplicateContents(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputContent   string
+		expectedOutput string
+		readerErr      error
+		writerErr      error
+		expectedErr    bool
+		loopNumber     int
+	}{
+		{
+			name:           "Successful duplication",
+			inputContent:   "hello",
+			expectedOutput: "hellohello",
+			readerErr:      nil,
+			writerErr:      nil,
+			expectedErr:    false,
+			loopNumber:     2,
+		},
+		{
+			name:           "Reader error",
+			inputContent:   "",
+			expectedOutput: "",
+			readerErr:      errors.New("read error"),
+			writerErr:      nil,
+			expectedErr:    true,
+			loopNumber:     2,
+		},
+		{
+			name:           "Writer error",
+			inputContent:   "hello",
+			expectedOutput: "",
+			readerErr:      nil,
+			writerErr:      errors.New("write error"),
+			expectedErr:    true,
+			loopNumber:     2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reader := &mockFileReader{
+				content: []byte(tt.inputContent),
+				err:     tt.readerErr,
+			}
+			writer := &mockFileWriter{
+				err: tt.writerErr,
+			}
+
+			err := duplicateContents("dummyInput", tt.loopNumber, reader, writer)
+
+			if tt.expectedErr {
+				if err == nil {
+					t.Errorf("expected an error but got none")
+				}
+			}
+
+			if !tt.expectedErr {
+				if err != nil {
+					t.Errorf("expected no error but got %v", err)
+				}
+
+			}
+
+			if tt.expectedOutput != string(writer.writtenContent) {
+				t.Errorf("expected %s but got %s", tt.expectedOutput, string(writer.writtenContent))
+			}
+
+		})
 	}
 
 }
