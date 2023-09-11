@@ -82,29 +82,95 @@ func TestReverse(t *testing.T) {
 			// 出力結果と期待値を確認
 			// 異常系の場合の確認
 			// エラーの期待値を確認
+
 			if tt.expectedErr {
 				if err == nil {
 					t.Errorf("expected an error but got none")
 				}
 			}
 
-			// 正常系の場合の確認
-			// 予期しないエラーが発生した場合の確認
 			if !tt.expectedErr {
 				if err != nil {
 					t.Errorf("expected no error but got %v", err)
 				}
 			}
 
+			// 正常系の場合の確認
+			// 予期しないエラーが発生した場合の確認
+
 		})
 	}
 
 }
 
+// copy関数のテストを実装
+func TestCopy(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputContent   string
+		expectedOutput string
+		readerErr      error
+		writerErr      error
+		expectedErr    bool
+	}{
+		{
+			name:           "Successful copy",
+			inputContent:   "hello",
+			expectedOutput: "hello",
+			readerErr:      nil,
+			writerErr:      nil,
+			expectedErr:    false,
+		},
+		{
+			name:           "Reader error",
+			inputContent:   "",
+			expectedOutput: "",
+			readerErr:      errors.New("read error"),
+			writerErr:      nil,
+			expectedErr:    true,
+		},
+		{
+			name:           "Writer error",
+			inputContent:   "hello",
+			expectedOutput: "",
+			readerErr:      nil,
+			writerErr:      errors.New("write error"),
+			expectedErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reader := &mockFileReader{
+				content: []byte(tt.inputContent),
+				err:     tt.readerErr,
+			}
+			writer := &mockFileWriter{
+				err: tt.writerErr,
+			}
+
+			err := copy("dummyInput", "dummyOutput", reader, writer)
+
+			if tt.expectedErr {
+				if err == nil {
+					t.Errorf("expected an error but got none")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("expected no error but got %v", err)
+				}
+			}
+
+		})
+
+	}
+
+}
+
 //プロセス
-//モック構造体を考える
-//テストケース考える
-//テストケースを実行する
+//モック構造体を考える(フィールドに実装データのかわりとなるデータを持つ)
+//テストケース考える（正常系、異常系）
+//テストケースを実行する（テーブルドリブンテスト）
 //テストケースの結果を確認する
 
 //インターフェースを関数に渡すことでメソッドを内部で呼び出す処理ができる

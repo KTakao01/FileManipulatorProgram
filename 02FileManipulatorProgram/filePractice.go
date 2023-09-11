@@ -38,7 +38,7 @@ type WriteFile interface {
 // コマンド名による動作の切り分け(共通)
 func main() {
 	if len(os.Args) < 4 {
-		fmt.Println("Usage: go run <file_name.go> reverse <inputfile> <outputfile>")
+		fmt.Println("Usage: go run <file_name.go> <command_name> <inputfile> <outputfile>")
 		return
 	}
 
@@ -55,11 +55,17 @@ func main() {
 		if err != nil {
 			fmt.Println("Error processing reverse:", err)
 		}
+	case "copy":
+		err := copy(inputFile, outputFile, ops, ops)
+		if err != nil {
+			fmt.Println("Error processing copy:", err)
+		}
+
 	}
 
 }
 
-// 個別コマンド（ここではreverse)の実装
+// 個別コマンドの実装
 // 入力、出力ファイルの指定が必要
 func reverse(inputFile, outputFile string, reader ReadFile, writer WriteFile) error {
 	// ファイルを読み込む
@@ -72,6 +78,19 @@ func reverse(inputFile, outputFile string, reader ReadFile, writer WriteFile) er
 	reverseData := reverseString(string(content))
 	// 逆順にしたデータを出力用ファイルにかき出し
 	err = writer.WriteFile(outputFile, []byte(reverseData), 0644)
+	if err != nil {
+		return fmt.Errorf("Error writing to file: %w", err)
+	}
+	return nil
+}
+
+func copy(inputFile, outputFile string, reader ReadFile, writer WriteFile) error {
+	//ファイルを読み込む
+	content, err := reader.ReadFile(inputFile)
+	if err != nil {
+		return fmt.Errorf("Error reading content: %w", err)
+	} //読み込んだデータを出力用ファイルにかき出し
+	err = writer.WriteFile(outputFile, content, 0644)
 	if err != nil {
 		return fmt.Errorf("Error writing to file: %w", err)
 	}
