@@ -80,20 +80,21 @@ func TestReverse(t *testing.T) {
 			// reverse関数を呼び出し
 			err := reverse("dummyInput", "dummyOutput", reader, writer)
 			// 出力結果と期待値を確認
-			// 正常系の場合の確認
+			// 異常系の場合の確認
+			// エラーの期待値を確認
 			if tt.expectedErr {
 				if err == nil {
 					t.Errorf("expected an error but got none")
 				}
 			}
-			// エラーの期待値を確認
+
+			// 正常系の場合の確認
+			// 予期しないエラーが発生した場合の確認
 			if !tt.expectedErr {
 				if err != nil {
 					t.Errorf("expected no error but got %v", err)
 				}
 			}
-			// 異常系の場合の確認
-			// 予期しないエラーが発生した場合の確認
 
 		})
 	}
