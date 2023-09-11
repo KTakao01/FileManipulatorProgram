@@ -31,7 +31,12 @@ Recursionのバックエンド・プロジェクト1の課題。</br>
 
 ## File Manipulator Program
 ### 概要
-・
+・以下のコマンドを実装</br>
+
+>reverse inputpath outputpath: inputpath にあるファイルを受け取り、outputpath に inputpath の内容を逆にした新しいファイルを作成します。
+copy inputpath outputpath: inputpath にあるファイルのコピーを作成し、outputpath として保存します。
+duplicate-contents inputpath n: inputpath にあるファイルの内容を読み込み、その内容を複製し、複製された内容を inputpath に n 回複製します。
+replace-string inputpath needle newstring: inputpath にあるファイルの内容から文字列 'needle' を検索し、'needle' の全てを 'newstring' に置き換えます。
 ### 工夫した点
 ・Pythonで解説されていたが、 Goに変換しながら課題を完了させたこと。</br>
 ・ユニットテストコードを書いたこと。(DI,モック構造体の作成,テストコードの実行,期待値と結果の比較)</br>
