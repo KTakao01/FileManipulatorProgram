@@ -250,6 +250,82 @@ func TestDuplicateContents(t *testing.T) {
 
 }
 
+func TestReplaceString(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputContent   string
+		searchKey      string
+		newString      string
+		expectedOutput string
+		readerErr      error
+		writerErr      error
+		expectedErr    bool
+	}{
+		{
+			name:           "Successful replacement",
+			inputContent:   "hello",
+			searchKey:      "l",
+			newString:      "x",
+			expectedOutput: "hexxo",
+			readerErr:      nil,
+			writerErr:      nil,
+			expectedErr:    false,
+		},
+		{
+			name:           "Reader error",
+			inputContent:   "",
+			searchKey:      "l",
+			newString:      "x",
+			expectedOutput: "",
+			readerErr:      errors.New("read error"),
+			writerErr:      nil,
+			expectedErr:    true,
+		},
+		{
+			name:           "Writer error",
+			inputContent:   "hello",
+			searchKey:      "l",
+			newString:      "x",
+			expectedOutput: "",
+			readerErr:      nil,
+			writerErr:      errors.New("write error"),
+			expectedErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reader := &mockFileReader{
+				content: []byte(tt.inputContent),
+				err:     tt.readerErr,
+			}
+
+			writer := &mockFileWriter{
+				err: tt.writerErr,
+			}
+			err := replaceString("dummyInput", "l", "x", reader, writer)
+
+			if tt.expectedErr {
+				if err == nil {
+					t.Errorf("expected an error but got none")
+				}
+			}
+
+			if !tt.expectedErr {
+				if err != nil {
+					t.Errorf("expected no error but got %v", err)
+				}
+			}
+
+			if tt.expectedOutput != string(writer.writtenContent) {
+				t.Errorf("expected %s ,but got %s", tt.expectedOutput, string(writer.writtenContent))
+			}
+
+		})
+	}
+
+}
+
 //プロセス
 //モック構造体を考える(フィールドに実装データのかわりとなるデータを持つ)
 //テストケース考える（正常系、異常系）
@@ -258,3 +334,10 @@ func TestDuplicateContents(t *testing.T) {
 
 //インターフェースを関数に渡すことでメソッドを内部で呼び出す処理ができる
 //呼び出す際にモック構造体を作成、そのメソッドもモック構造体のフィールドを返すようにすると実際のデータを使用せずシミュレートできる
+
+//実際の手順
+//テストコードの作成方法
+//テスト構造体かく
+//スコープわけ
+//モック構造体つくる
+//メソッドつくる

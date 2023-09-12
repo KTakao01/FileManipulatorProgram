@@ -180,3 +180,10 @@ func reverseString(s string) string {
 //osパッケージのfunc Open(name string) (*File, error)
 //osパッケージのfunc WriteFile(filename string, data []byte, perm FileMode) error
 //func (f *File) Read(b []byte) (n int, err error):File型はReaderインターフェースを実装している
+
+//実際の手順
+//DIの作成方法
+//関数の作成
+//ライブラリに基づかないようにラップ関数の作成
+//それをもつ構造体の作成
+//その構造体の抽象化したインターフェース作成
