@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 //main,reverseへの切り分け
@@ -45,17 +46,19 @@ func main() {
 
 	command := os.Args[1]
 	inputFile := os.Args[2]
-	var outputFile, duplicateNumber string
+	var outputFile, duplicateNumber, searchKey, newString string
 
-	if command == "copy" || command == "reverse" {
+	switch command {
+	case "reverse", "copy":
 		outputFile = os.Args[3]
-	}
-
-	if command == "duplicate-contents" {
+	case "duplicate-contents":
 		duplicateNumber = os.Args[3]
+	case "replace-string":
+		searchKey = os.Args[3]
+		newString = os.Args[4]
 	}
 
-	//モックのための便宜的な具体型の導入
+	//モックのために用意したインターフェースに便宜的な具体型の導入
 	ops := &defaultFileOperations{}
 
 	//コマンド別に呼び出す関数を切り分ける
@@ -80,8 +83,12 @@ func main() {
 			fmt.Println("Error processing duplicate-contents:", err)
 		}
 
+	case "replace-string":
+		err := replaceString(inputFile, searchKey, newString, ops, ops)
+		if err != nil {
+			fmt.Println("Error processing replace-string:", err)
+		}
 	}
-
 }
 
 // 個別コマンドの実装
@@ -133,6 +140,21 @@ func duplicateContents(inputFile string, loopNumber int, reader ReadFile, writer
 		return fmt.Errorf("Error writing to file: %w", err)
 	}
 
+	return nil
+}
+
+func replaceString(inputFile, searchKey, newString string, reader ReadFile, writer WriteFile) error {
+	content, err := reader.ReadFile(inputFile)
+	if err != nil {
+		return fmt.Errorf("Error reading content: %w", err)
+	}
+
+	replacedContent := strings.Replace(string(content), searchKey, newString, -1)
+
+	err = writer.WriteFile(inputFile, []byte(replacedContent), 0644)
+	if err != nil {
+		return fmt.Errorf("Error writing to file: %w", err)
+	}
 	return nil
 }
 
