@@ -46,7 +46,7 @@ replace-string inputpath needle newstring: inputpath にあるファイルの内
 ・テストコードを作ったのでCIを構築したい。</br>
 
 ## Markdown to HTML Converter
-###概要
+### 概要
 >タスクはマークダウンを HTML に変換するプログラムを作成し、シェルを通して python3 file-converter.py markdown inputfile outputfile というコマンドを実行させることです。</br>ここで、markdown は実行するコマンド、inputfile は .md ファイルへのパス、出力パスはプログラムを実行した後に作成される .html です。</br>
 
 ### 工夫した点
@@ -54,3 +54,4 @@ replace-string inputpath needle newstring: inputpath にあるファイルの内
 ### 苦労した点
 ・パッケージの選定を悩んだ。使用感は似ている２つのパッケージのどちらを使うか。定番で更新がとまっているものと比較的新しいものと。情報はいずれにしても公式ドキュメントがほとんどだった。
 ### 改善点
+・特になし。シンプルに実装したはず。諸々課題があったとしても他のプロジェクトで反映する予定。
