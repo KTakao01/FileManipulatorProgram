@@ -56,3 +56,4 @@ replace-string inputpath needle newstring: inputpath にあるファイルの内
 目立った差異がみられなかったので、使いやすそうな前者を使用した。
 ### 改善点
 ・特になし。シンプルに実装したはず。諸々課題があったとしても他のプロジェクトで反映する予定。
+・blackfridayのライブラリの中身をおいおい読みたい。
